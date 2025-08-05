@@ -1,0 +1,6 @@
+*.swp
+tags
+.vim/plugged/*
+.vim/.netrwhist
+runtime
+apt-cyg

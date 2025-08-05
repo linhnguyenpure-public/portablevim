@@ -1,0 +1,46 @@
+#Mac
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Set CLICOLOR if you want Ansi Colors in iTerm2 
+    export CLICOLOR=1
+    
+    # Set colors to match iTerm2 Terminal Colors
+    export TERM=xterm-256color
+    PS1='\[\e[33;1m\]\u@\h: \[\e[31m\]\W\[\e[0m\]$ '
+    export LSCOLORS=gxBxhxDxfxhxhxhxhxcxcx
+    
+    alias ll="ls -la"
+    alias ls="ls -a"
+    
+    ## Make ~/bin my goto path
+    #[[ :$PATH: == *:$HOME/bin:* ]] || PATH=$HOME/bin:$PATH
+    # git rev-list --all | xargs git grep <regex> #----> git search for a phrase in content of the commit
+    
+    # Grep default options
+    export GREP_OPTIONS='--color=auto --exclude=*.pyc --exclude-dir=.git --exclude=cscope.out --exclude=tags'
+    #-e PORTABLEVIM=/Users/linh_nguyen2/Documents/pubrepos/portablevim
+    
+    
+    # Setting PATH for Python 3.8
+    # The original version is saved in .bash_profile.pysave
+    # Avoid duplicating PATH entries
+    add_to_path() {
+      case ":$PATH:" in
+        *"$1:"*) ;;
+        *) PATH="$1:$PATH" && export PATH;;
+      esac
+    }
+    
+    # Add needed paths cleanly
+      add_to_path "/Library/Frameworks/Python.framework/Versions/3.8/bin"
+      add_to_path "/Users/linh_nguyen2/Documents/pubrepos/portablevim"
+    
+    if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+      exec tmux
+    fi
+#Cygwin
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+    if [ -f "${HOME}/.bashrc" ] ; then
+        source "${HOME}/.bashrc"
+    fi
+fi
+source ~/.proprietary.sh

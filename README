@@ -1,0 +1,40 @@
+./setup.sh
+
+-----------------------------
+If MACOS
+
+Check .bash_profile for outdated links
+
+
+Also, in iterm2 > Preferences > Profiles > General > Command > Command : ssh -Y admin > Working Directory > Reuse previous session
+         iterm2 > Preferences > Advanced > Tabs > Add new tab at the end of tab bar
+
+OR with mosh:
+Install mosh in both client and server
+Also, in iterm2 > Preferences > Profiles > General > Command > Login Shell:/usr/local/bin/mosh admin > Working Directory > Reuse previous session
+iterm2 > Preferences > Selection > Applications in terminal may access clipboard
+
+optional: if need to ssh to an admin machine:
+if using custom.sh, need to setup $REMOTE_NAME
+
+-----------------------------
+If Windows
+Use Cygwin
+
+Visual Studio code
+Vim extension, files > systems > settings, search for "vim clipboard", need to reopen file
+
+-----------------------------
+
+For Python:
+    virtualenv
+
+For Ruby:
+    rvm
+    bundler
+    pgp
+
+-----------------------------
+
+ctags -Ra /usr/local/lib/python2.7/site-packages/*
+cd /usr/local/lib/python2.7/site-packages/ && ctags -R * && ctags -Ra /usr/lib/python2.7/
