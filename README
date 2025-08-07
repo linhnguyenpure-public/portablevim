@@ -20,6 +20,13 @@ if using custom.sh, need to setup $REMOTE_NAME
 -----------------------------
 If Windows
 Use Cygwin
+Script will change home directory of cygwin, do this before running
+    echo -e 'db_home:  /%H/cygwin' >> /etc/nsswitch.conf
+Restart Cygwin
+
+In tmux, hold Shift + drag mouse to copy to windows clipboard
+
+TODO: Disable tmux config in this repo. Not sure why tmux is slow after installing portablevim
 
 Visual Studio code
 Vim extension, files > systems > settings, search for "vim clipboard", need to reopen file

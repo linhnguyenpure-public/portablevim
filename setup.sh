@@ -54,7 +54,8 @@ fi
 set +x
 echo "About to delete and recreate:"
 echo "runtime"
-echo "~/.bash_profile, ~/.bashrc, ~/.custom.sh"
+#echo "~/.bash_profile, ~/.bashrc
+echo "~/.custom.sh"
 echo "~/.tmux.conf"
 echo "~/.vimrc, ~/.vim"
 echo "~/.ctags"
@@ -63,15 +64,18 @@ read -n 1 -s -r -p "Press c to continue, s to skip..." continue && echo
 if [[ $continue == "c" ]]; then
     echo "Remove above files"
     rm -rf runtime
-    rm -rf ~/.bash_profile ~/.bashrc ~/.custom.sh
+    #rm -rf ~/.bash_profile ~/.bashrc
+    rm -rf ~/.custom.sh
     rm -rf ~/.tmux.conf
     rm -rf ~/.vimrc ~/.vim
     rm -rf ~/.ctags
 
     echo "Create and link above files"
     mkdir $runpath
-    cp $cpath/.bash_profile $runpath/.bash_profile && ( [ -L ~/.bashrc ] || ln -s $runpath/.bash_profile ~/.bash_profile )
-    echo -e "PORTABLEVIM=`pwd`\n" >> $runpath/.bash_profile
+    cp $cpath/.bash_profile_portable $runpath/.bash_profile_portable
+    echo -e "PORTABLEVIM=`pwd`\n" >> $runpath/.bash_profile_portable
+    echo -e "source $runpath/.bash_profile_portable\n" >> $runpath/.bash_profile_portable
+
     cp -r $cpath/.bashrc $runpath/.bashrc && ( [ -L ~/.bashrc ] || ln -s $runpath/.bashrc ~/.bashrc )
     cp -r $cpath/.custom.sh $runpath/.custom.sh && ( [ -L ~/.custom.sh ] || ln -s $runpath/.custom.sh ~/.custom.sh )
 
@@ -106,7 +110,14 @@ if [[ "$OSTYPE" == "cygwin" ]]; then
     echo -e 'alias python="python -i"\n' >> $runpath/.bash_profile
 
     #Change default cygwin home folder, per https://cygwin.com/cygwin-ug-net/ntsec.html#ntsec-mapping-nsswitch-syntax
-    echo -e 'db_home:  /%H/cygwin' >> /etc/nsswitch.conf
+    # Move this step in README, do manually
+    #echo -e 'db_home:  /%H/cygwin' >> /etc/nsswitch.conf
+    #echo "Restart cygwin now"
+
+    # Setup SSH
+    [ -L ~/.ssh/config ] || ln -s /cygdrive/c/Users/$USERNAME/.ssh/config ~/.ssh/config
+    [ -L ~/.ssh/id_ed25519 ] || ln -s /cygdrive/c/Users/$USERNAME/.ssh/id_ed25519 ~/.ssh/id_ed25519
+    [ -L ~/.ssh/id_ed25519.pub ] || ln -s /cygdrive/c/Users/$USERNAME/.ssh/id_ed25519.pub ~/.ssh/id_ed25519.pub
 
     # For gitk
     # export DISPLAY=localhost:0.0 xterm
@@ -151,7 +162,7 @@ fi
 if [[ "$OSTYPE" == "cygwin" ]]; then
     set +x
     echo "Open setup-x86_64.exe cygwin then install:"
-    echo "lynx, vim, apt-cyg"
+    echo "vim, mosh"
     echo "wget, git, ctags, tmux"
     # https://unix.stackexchange.com/questions/227889/cygwin-on-windows-cant-open-display
     # also install xinit and xorg-server to enable gitk
@@ -196,6 +207,18 @@ if [[ "$OSTYPE" != "cygwin" ]]; then
     [ `which ctags` == "/opt/homebrew/bin/ctags" ] || gumma_install ctags || gumma_install exuberant-ctags
     [ `which tmux` == "/opt/homebrew/bin/tmux" ] || gumma_install tmux
     gumma_install vim
+
+    ## Setup SSH
+    echo "Plugin: YouCompleteMe needs to be compiled. Go to its website to get instructions"
+    mkdir -p ~/.ssh
+    chmod 700 ~/.ssh
+    KEY_FILE=~/.ssh/id_ed25519
+    if [ ! -f "$KEY_FILE" ]; then
+        echo "Generating new ED25519 SSH key..."
+        ssh-keygen -t ed25519 -C "$(whoami)@$(hostname)" -f "$KEY_FILE" -N ""
+    else
+        echo "SSH key already exists at $KEY_FILE"
+    fi
 fi
 
 
@@ -205,18 +228,6 @@ fi
 read -p "Install vim plugins? y/n" install
 if [[ $install == "y" ]]; then
     vim +PlugInstall +qall # install all plugins
-fi
-
-## Setup SSH
-echo "Plugin: YouCompleteMe needs to be compiled. Go to its website to get instructions"
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-KEY_FILE=~/.ssh/id_ed25519
-if [ ! -f "$KEY_FILE" ]; then
-    echo "Generating new ED25519 SSH key..."
-    ssh-keygen -t ed25519 -C "$(whoami)@$(hostname)" -f "$KEY_FILE" -N ""
-else
-    echo "SSH key already exists at $KEY_FILE"
 fi
 
 #exec -l $SHELL not sure what this is for
