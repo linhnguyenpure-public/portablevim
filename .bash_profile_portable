@@ -34,9 +34,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
       add_to_path "/Library/Frameworks/Python.framework/Versions/3.8/bin"
       add_to_path "/Users/linh_nguyen2/Documents/pubrepos/portablevim"
     
-    if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-      exec tmux
-    fi
+    #if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+    #  exec tmux
+    #fi
 #Cygwin
 elif [[ "$OSTYPE" == "cygwin" ]]; then
     if [ -f "${HOME}/.bashrc" ] ; then

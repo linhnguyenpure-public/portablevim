@@ -54,7 +54,7 @@ fi
 set +x
 echo "About to delete and recreate:"
 echo "runtime"
-echo "~/.bash_profile, ~/.bashrc, ~/.custom.sh"
+echo "~/.custom.sh"
 echo "~/.tmux.conf"
 echo "~/.vimrc, ~/.vim"
 echo "~/.ctags"
@@ -63,15 +63,17 @@ read -n 1 -s -r -p "Press c to continue, s to skip..." continue && echo
 if [[ $continue == "c" ]]; then
     echo "Remove above files"
     rm -rf runtime
-    rm -rf ~/.bash_profile ~/.bashrc ~/.custom.sh
+    rm -rf ~/.custom.sh
     rm -rf ~/.tmux.conf
     rm -rf ~/.vimrc ~/.vim
     rm -rf ~/.ctags
 
     echo "Create and link above files"
     mkdir $runpath
-    cp $cpath/.bash_profile $runpath/.bash_profile && ( [ -L ~/.bashrc ] || ln -s $runpath/.bash_profile ~/.bash_profile )
-    echo -e "PORTABLEVIM=`pwd`\n" >> $runpath/.bash_profile
+    cp $cpath/.bash_profile_portable $runpath/.bash_profile_portable
+    echo -e "PORTABLEVIM=`pwd`\n" >> $runpath/.bash_profile_portable
+    echo -e "source $runpath/.bash_profile_portable\n" >> $runpath/.bash_profile_portable
+
     cp -r $cpath/.bashrc $runpath/.bashrc && ( [ -L ~/.bashrc ] || ln -s $runpath/.bashrc ~/.bashrc )
     cp -r $cpath/.custom.sh $runpath/.custom.sh && ( [ -L ~/.custom.sh ] || ln -s $runpath/.custom.sh ~/.custom.sh )
 
@@ -94,7 +96,6 @@ fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
     cp -r $cpath/.iterm2 $runpath/.iterm2 && ( [ -L ~/.iterm2 ] || ln -s $runpath/.iterm2 ~/.iterm2 )
     cp -r $cpath/Mac/.iterm2_shell_integration.bash $runpath/.iterm2_shell_integration.bash && ( [ -L ~/.iterm2_shell_integration.bash ] || ln -s $runpath/.iterm2_shell_integration.bash ~/.iterm2_shell_integration.bash )
-    #echo -e "alias vim=\$PORTABLEVIM/Mac/vim\n" >> $runpath/.bash_profile
 
     # Increase keyboard key repeat rate
     defaults write -g InitialKeyRepeat -int 10
@@ -103,7 +104,7 @@ fi
 
 ## OS-specific Setup: Dotfiles & Settings -- Cygwin
 if [[ "$OSTYPE" == "cygwin" ]]; then
-    echo -e 'alias python="python -i"\n' >> $runpath/.bash_profile
+    echo -e 'alias python="python -i"\n' >> $runpath/.bash_profile_portable
 
     #Change default cygwin home folder, per https://cygwin.com/cygwin-ug-net/ntsec.html#ntsec-mapping-nsswitch-syntax
     echo -e 'db_home:  /%H/cygwin' >> /etc/nsswitch.conf
@@ -132,7 +133,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # Setup PATH for bash
         # https://stackoverflow.com/questions/10574969/how-do-i-install-bash-3-2-25-on-mac-os-x-10-5-8
     echo '/opt/homebrew/bin/bash' | sudo tee -a /etc/shells;
-    [[ "$PATH" == *"homebrew"* ]] || echo -e "PATH=/opt/homebrew/bin:$PATH" >> $runpath/.bash_profile
+    [[ "$PATH" == *"homebrew"* ]] || echo -e "PATH=/opt/homebrew/bin:$PATH" >> $runpath/.bash_profile_portable
     [[ "$SHELL" == *"bash"* ]] || chsh -s /opt/homebrew/bin/bash
 
     gumma_install reattach-to-user-namespace
