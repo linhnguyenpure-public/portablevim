@@ -107,7 +107,14 @@ if [[ "$OSTYPE" == "cygwin" ]]; then
     echo -e 'alias python="python -i"\n' >> $runpath/.bash_profile_portable
 
     #Change default cygwin home folder, per https://cygwin.com/cygwin-ug-net/ntsec.html#ntsec-mapping-nsswitch-syntax
-    echo -e 'db_home:  /%H/cygwin' >> /etc/nsswitch.conf
+    # Move this step in README, do manually
+    #echo -e 'db_home:  /%H/cygwin' >> /etc/nsswitch.conf
+    #echo "Restart cygwin now"
+
+    # Setup SSH
+    [ -L ~/.ssh/config ] || ln -s /cygdrive/c/Users/$USERNAME/.ssh/config ~/.ssh/config
+    [ -L ~/.ssh/id_ed25519 ] || ln -s /cygdrive/c/Users/$USERNAME/.ssh/id_ed25519 ~/.ssh/id_ed25519
+    [ -L ~/.ssh/id_ed25519.pub ] || ln -s /cygdrive/c/Users/$USERNAME/.ssh/id_ed25519.pub ~/.ssh/id_ed25519.pub
 
     # For gitk
     # export DISPLAY=localhost:0.0 xterm
@@ -152,7 +159,7 @@ fi
 if [[ "$OSTYPE" == "cygwin" ]]; then
     set +x
     echo "Open setup-x86_64.exe cygwin then install:"
-    echo "lynx, vim, apt-cyg"
+    echo "vim, mosh"
     echo "wget, git, ctags, tmux"
     # https://unix.stackexchange.com/questions/227889/cygwin-on-windows-cant-open-display
     # also install xinit and xorg-server to enable gitk
@@ -197,6 +204,18 @@ if [[ "$OSTYPE" != "cygwin" ]]; then
     [ `which ctags` == "/opt/homebrew/bin/ctags" ] || gumma_install ctags || gumma_install exuberant-ctags
     [ `which tmux` == "/opt/homebrew/bin/tmux" ] || gumma_install tmux
     gumma_install vim
+
+    ## Setup SSH
+    echo "Plugin: YouCompleteMe needs to be compiled. Go to its website to get instructions"
+    mkdir -p ~/.ssh
+    chmod 700 ~/.ssh
+    KEY_FILE=~/.ssh/id_ed25519
+    if [ ! -f "$KEY_FILE" ]; then
+        echo "Generating new ED25519 SSH key..."
+        ssh-keygen -t ed25519 -C "$(whoami)@$(hostname)" -f "$KEY_FILE" -N ""
+    else
+        echo "SSH key already exists at $KEY_FILE"
+    fi
 fi
 
 
@@ -206,18 +225,6 @@ fi
 read -p "Install vim plugins? y/n" install
 if [[ $install == "y" ]]; then
     vim +PlugInstall +qall # install all plugins
-fi
-
-## Setup SSH
-echo "Plugin: YouCompleteMe needs to be compiled. Go to its website to get instructions"
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-KEY_FILE=~/.ssh/id_ed25519
-if [ ! -f "$KEY_FILE" ]; then
-    echo "Generating new ED25519 SSH key..."
-    ssh-keygen -t ed25519 -C "$(whoami)@$(hostname)" -f "$KEY_FILE" -N ""
-else
-    echo "SSH key already exists at $KEY_FILE"
 fi
 
 #exec -l $SHELL not sure what this is for
