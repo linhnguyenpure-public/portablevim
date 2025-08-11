@@ -44,4 +44,5 @@ elif [[ "$OSTYPE" == "cygwin" ]]; then
     fi
 fi
 source ~/.proprietary.sh
+PORTABLEVIM=/cygdrive/c/Users/linguyen/cygwin/repos/public/portablevim
 stty sane

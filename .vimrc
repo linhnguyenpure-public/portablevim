@@ -3,8 +3,8 @@ Plug 'tpope/vim-sensible' "Some standard vim config
 Plug 'tpope/vim-fugitive' "Git wrapper in vim
 Plug 'flazz/vim-colorschemes'
 "These 2 are used for keeping cursor at same position while using * search
-Plug 'vim-scripts/ingo-library'
-Plug 'vim-scripts/SearchHighlighting'
+Plug 'vim-scripts/ingo-library' "Autoload functions for vim
+Plug 'vim-scripts/SearchHighlighting' "Changes star command to not jump to next match
 Plug 'vim-scripts/highlight.vim' "To highlight line
 Plug 'vim-scripts/IndexedSearch' "To print at match N out of M matches
 Plug 'vim-scripts/grep.vim' "To grep phrase in all source files
@@ -13,9 +13,9 @@ Plug 'vim-scripts/genutils' "Required for tagselect
 Plug 'lnguyen639/tagselect' "To search in vim ctags, use g] instead of Ctrl]
 Plug 'rodjek/vim-puppet' "Plug in for puppet coding
 Plug 'ctrlpvim/ctrlp.vim' "Plug in for indexing all files in current repo
-Plug 'w0rp/ale'
+Plug 'w0rp/ale' "Linting for vim
 "https://unix.stackexchange.com/questions/7695/how-to-make-vim-display-colors-as-indicated-by-color-codes
-Plug 'powerman/vim-plugin-AnsiEsc'
+Plug 'powerman/vim-plugin-AnsiEsc' "Conceals ANSI escape sequences but color it
 "Plug 'darfink/vim-plist' "plist in OSX
 
 "Plug to auto index with ctags - disable due to slow startup time
@@ -32,11 +32,13 @@ set encoding=utf-8 "YouCompleteMe unavailable: requires UTF-8 encoding. Put the 
 " On-demand loading
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 
+"Linhtmp: disable because it's hanging at opening 1 C file
 " Autocomplete with LSP
-Plug 'https://github.com/prabirshrestha/vim-lsp'
-Plug 'https://github.com/mattn/vim-lsp-settings'
-Plug 'https://github.com/prabirshrestha/asyncomplete.vim'
-Plug 'https://github.com/prabirshrestha/asyncomplete-lsp.vim'
+"Plug 'https://github.com/prabirshrestha/vim-lsp'
+"Plug 'https://github.com/mattn/vim-lsp-settings'
+"Plug 'https://github.com/prabirshrestha/asyncomplete.vim'
+"Plug 'https://github.com/prabirshrestha/asyncomplete-lsp.vim'
+" EndLinhtmp
 call plug#end()
 
 " Set cscope shortcuts for vim
@@ -115,6 +117,10 @@ nmap <F5> :TlistToggle<CR>
 "Highlight current line
 "Copy gf <cfile> to clipboard: Yes, I did it myself + https://vi.stackexchange.com/questions/9627/how-can-i-get-vim-to-include-suffixes-in-cfile
 nmap yf :call setreg("*", expand("<cfile>"))<CR>
+
+" For cygwin: Do \cp to copy file path to system clipboard
+" replace with C:\Users\ - Ref: chatgpt
+nnoremap <leader>cp :let @+ = substitute(substitute(expand('%:p'), '^/cygdrive/\([a-z]\)', '\U\1:', ''), '/', '\', 'g')<CR>
 
 "https://stackoverflow.com/questions/1152362/how-to-send-data-to-local-clipboard-from-a-remote-ssh-session   -- comment in top answer
 "https://stackoverflow.com/questions/12414745/send-echo-or-register-contents-to-pbcopy-mac-clipboard-on-mac-os-x
