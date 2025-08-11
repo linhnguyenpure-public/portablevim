@@ -116,6 +116,10 @@ nmap <F5> :TlistToggle<CR>
 "Copy gf <cfile> to clipboard: Yes, I did it myself + https://vi.stackexchange.com/questions/9627/how-can-i-get-vim-to-include-suffixes-in-cfile
 nmap yf :call setreg("*", expand("<cfile>"))<CR>
 
+" For cygwin: Do \cp to copy file path to system clipboard
+" replace with C:\Users\ - Ref: chatgpt
+nnoremap <leader>cp :let @+ = substitute(substitute(expand('%:p'), '^/cygdrive/\([a-z]\)', '\U\1:', ''), '/', '\', 'g')<CR>
+
 "https://stackoverflow.com/questions/1152362/how-to-send-data-to-local-clipboard-from-a-remote-ssh-session   -- comment in top answer
 "https://stackoverflow.com/questions/12414745/send-echo-or-register-contents-to-pbcopy-mac-clipboard-on-mac-os-x
 "Copy current selection to remote clipboard
