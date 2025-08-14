@@ -291,5 +291,8 @@ if [[ $install == "y" ]]; then
     vim +PlugInstall +qall # install all plugins
 fi
 
+## Git
+git config --global core.editor "vim"
+
 #exec -l $SHELL not sure what this is for
 echo "Setup finished"
