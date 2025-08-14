@@ -20,25 +20,31 @@ if [[ "$OSTYPE" == "cygwin" ]]; then
     :
 fi
 
-## Define installer: Linux
+# Define installer: Linux
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    set +e
     uname -a | grep Debian
-    if [[ $? == "0" ]]; then
+    if [[ "$?" == "0" ]]; then
+	set -e
         gumma_install() {
             sudo apt-get install $1
         }
-    else
-        # In case this is WSL with Ubuntu LST
-        uname -a | grep USLT
-        if [[ $? == "0" ]]; then
-            gumma_install() {
-                sudo apt-get install $1
-            }
-	    else
-            gumma_install() {
-                yum install $1
-            }
-        fi
+    fi
+fi
+
+# Define installer: WSL
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+	set -e
+    # In case this is WSL with Ubuntu LST
+    uname -a | grep WSL2
+    if [[ "$?" == "0" ]]; then
+        gumma_install() {
+            sudo apt-get install $1
+        }
+        else
+        gumma_install() {
+            yum install $1
+        }
     fi
 fi
 
@@ -74,7 +80,6 @@ if [[ $continue == "c" ]]; then
     echo -e "PORTABLEVIM=`pwd`\n" >> $runpath/.bash_profile_portable
     echo -e "source $runpath/.bash_profile_portable\n" >> $runpath/.bash_profile_portable
 
-    cp -r $cpath/.bashrc $runpath/.bashrc && ( [ -L ~/.bashrc ] || ln -s $runpath/.bashrc ~/.bashrc )
     cp -r $cpath/.custom.sh $runpath/.custom.sh && ( [ -L ~/.custom.sh ] || ln -s $runpath/.custom.sh ~/.custom.sh )
 
     cp -r $cpath/.tmux.conf $runpath/.tmux.conf && ( [ -L ~/.tmux.conf ] || ln -s $runpath/.tmux.conf ~/.tmux.conf )
@@ -100,6 +105,10 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # Increase keyboard key repeat rate
     defaults write -g InitialKeyRepeat -int 10
     defaults write -g KeyRepeat -int 1
+
+    # Tmux ctags
+    TMUXBIN="/opt/homebrew/bin/tmux"
+    CTAGSBIN="/opt/homebrew/bin/ctags"
 fi
 
 ## OS-specific Setup: Dotfiles & Settings -- Cygwin
@@ -120,16 +129,54 @@ if [[ "$OSTYPE" == "cygwin" ]]; then
     # export DISPLAY=localhost:0.0 xterm
 
     cuser=$(whoami | awk -F'\\' '{print $2}')
+
+    # Tmux ctags
+    TMUXBIN="/usr/bin/tmux"
+    CTAGSBIN="/usr/bin/ctags"
 fi
 
 ## OS-specific Setup: Dotfiles & Settings -- Linux
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-    :
+    ### Debian
+    set +e
+    uname -a | grep Debian
+    if [[ $? == "0" ]]; then
+        :
+    fi
+    set -e
+
+    # Tmux ctags
+    TMUXBIN="/usr/bin/tmux"
+    CTAGSBIN="/usr/bin/ctags"
 fi
 
-## Pi
+## OS-specific Setup: Dotfiles & Settings -- WSL
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    ### WSL with Ubuntu LST
+    set +e
+    uname -a | grep WSL2
+    if [[ $? == "0" ]]; then
+	:
+	# Ref: https://superuser.com/questions/1183176/can-i-share-my-ssh-keys-between-wsl-and-windows
+	echo "Add this in /etc/fstab of WSL then restart WSL"
+	echo "C:\Users\<your Windows username>\.ssh\ /home/<your Linux username>/.ssh drvfs rw,noatime,uid=1000,gid=1000,case=off,umask=0077,fmask=0177 0 0"
+	echo "wsl.exe --shutdown"
+	read -n 1 -srp "Press e to exit, c if this was done..." continue && echo
+	[[ $continue == "e" ]] && exit
+    fi
+    set -e
+
+    # Tmux ctags
+    TMUXBIN="/usr/bin/tmux"
+    CTAGSBIN="/usr/bin/ctags"
+fi
+
+## OS-specific Setup: Dotfiles & Settings -- Pi
 if [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
-    :
+
+    # Tmux ctags
+    TMUXBIN="/usr/bin/tmux"
+    CTAGSBIN="/usr/bin/ctags"
 fi
 
 # OS-specific Setup: Apps
@@ -172,23 +219,40 @@ fi
 ## OS-specific Setup: Apps -- Linux
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     ### Debian
+    set +e
     uname -a | grep Debian
     if [[ $? == "0" ]]; then
+        set -e
         # https://vi.stackexchange.com/questions/13564/why-is-vim-for-debian-compiled-without-clipboard
         gumma_install vim-gtk
     fi
+    set -e
+fi
 
-    ### WSL with Ubuntu LST
-    uname -a | grep USLT
+## OS-specific Setup: Apps -- WSL
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    set +e
+    uname -a | grep WSL2
     if [[ $? == "0" ]]; then
-	    # NOTE: Use nvim instead, to get clipboard to work, need to download vcxsrv and run server
-        gumma_install nvim
+	    set -e
+        ## NOTE: Use nvim instead, to get clipboard to work, need to download vcxsrv and run server
+        gumma_install neovim
         gumma_install xclip
-        set +x
-        echo 'Need to install https://github.com/mintty/wsltty for mouse to work in WSL'
-        echo 'Need to build vim from scratch for clipboard, x11 features'
-        set -x
+        #set +x
+        #echo 'Need to install https://github.com/mintty/wsltty for mouse to work in WSL'
+        #echo 'Need to build vim from scratch for clipboard, x11 features'
+        #set -x
+
+        # Install eternal terminal
+        # https://eternalterminal.dev/download/
+        command -v et || {
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository ppa:jgmath2000/et
+        sudo apt-get update
+        sudo apt-get install et
+	    }
     fi
+    set -e
 fi
 
 ## OS-specific Setup: Apps -- Pi
@@ -201,8 +265,8 @@ fi
 if [[ "$OSTYPE" != "cygwin" ]]; then
     command -v wget || gumma_install wget
     command -v git || gumma_install git
-    [ `which ctags` == "/opt/homebrew/bin/ctags" ] || gumma_install ctags || gumma_install exuberant-ctags
-    [ `which tmux` == "/opt/homebrew/bin/tmux" ] || gumma_install tmux
+    [ `which ctags` == "$CTAGSBIN" ] || gumma_install ctags || gumma_install exuberant-ctags
+    [ `which tmux` == "$TMUXBIN" ] || gumma_install tmux
     gumma_install vim
 
     ## Setup SSH

@@ -30,6 +30,11 @@ Visual Studio code
 Vim extension, files > systems > settings, search for "vim clipboard", need to reopen file
 
 -----------------------------
+If Wsl
+Use Windows Terminal, use settings.json for it
+
+Install Eternal Terminal
+-----------------------------
 
 For Python:
     virtualenv
