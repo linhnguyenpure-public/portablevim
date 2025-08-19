@@ -235,8 +235,8 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     uname -a | grep WSL2
     if [[ $? == "0" ]]; then
 	    set -e
-        ## NOTE: Use nvim instead, to get clipboard to work, need to download vcxsrv and run server
-        gumma_install neovim
+        # Install vim-gtk3 for clipboard
+        gumma_install vim-gtk3
         gumma_install xclip
         #set +x
         #echo 'Need to install https://github.com/mintty/wsltty for mouse to work in WSL'
