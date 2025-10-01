@@ -34,6 +34,7 @@ If Wsl
 Use Windows Terminal, use settings.json for it
 
 Install Eternal Terminal
+Enable SSH server service (ask chatgpt)
 -----------------------------
 
 For Python:
@@ -43,6 +44,10 @@ For Ruby:
     rvm
     bundler
     pgp
+
+For Git:
+    [core]
+        sshCommand = ssh -i ~/.ssh/id_ed25519 -F /dev/null -o IdentitiesOnly=yes
 
 -----------------------------
 
