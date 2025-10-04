@@ -33,10 +33,10 @@ set encoding=utf-8 "YouCompleteMe unavailable: requires UTF-8 encoding. Put the 
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 
 " Autocomplete with LSP
-Plug 'https://github.com/prabirshrestha/vim-lsp'
-Plug 'https://github.com/mattn/vim-lsp-settings'
-Plug 'https://github.com/prabirshrestha/asyncomplete.vim'
-Plug 'https://github.com/prabirshrestha/asyncomplete-lsp.vim'
+"Plug 'https://github.com/prabirshrestha/vim-lsp'
+"Plug 'https://github.com/mattn/vim-lsp-settings'
+"Plug 'https://github.com/prabirshrestha/asyncomplete.vim'
+"Plug 'https://github.com/prabirshrestha/asyncomplete-lsp.vim'
 call plug#end()
 
 " Set cscope shortcuts for vim
@@ -159,3 +159,8 @@ autocmd WinEnter * if !exists('w:matchId') | let w:matchId = MatchAddHighlight()
 "Zooming https://medium.com/@vinodkri/zooming-vim-window-splits-like-a-pro-d7a9317d40
 noremap Zz <c-w>_ \| <c-w>\|
 noremap Zo <c-w>=
+
+"Source customized/proprietary files
+if filereadable("~/.proprietary.vim")
+        source ~/.proprietary.vim
+endif
