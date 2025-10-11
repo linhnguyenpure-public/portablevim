@@ -8,9 +8,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     brew --version || /opt/homebrew/bin/brew --version || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     gumma_install () {
         #use this for supported os
-        #brew install --build-from-source $1 || /opt/homebrew/bin/brew upgrade $1
+        brew install --build-from-source $1 || /opt/homebrew/bin/brew upgrade $1
         #use this for non-supported os
-        /opt/homebrew/bin/brew install --build-from-source $(/opt/homebrew/bin/brew deps --include-build $1) $1 || /opt/homebrew/bin/brew upgrade $1
+        #/opt/homebrew/bin/brew install --build-from-source $(/opt/homebrew/bin/brew deps --include-build $1) $1 || /opt/homebrew/bin/brew upgrade $1
     }
 fi 
 
@@ -62,6 +62,7 @@ echo "About to delete and recreate:"
 echo "runtime"
 echo "~/.custom.sh"
 echo "~/.tmux.conf"
+echo "~/.tmux"
 echo "~/.vimrc, ~/.vim"
 echo "~/.ctags"
 set -x
@@ -71,6 +72,7 @@ if [[ $continue == "c" ]]; then
     rm -rf runtime
     rm -rf ~/.custom.sh
     rm -rf ~/.tmux.conf
+    rm -rf ~/.tmux
     rm -rf ~/.vimrc ~/.vim
     rm -rf ~/.ctags
 
@@ -182,15 +184,15 @@ fi
 # OS-specific Setup: Apps
 ## OS-specific Setup: Apps -- Mac
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    gumma_install bash
+    command -v bash || gumma_install bash
 
     # Setup PATH for bash
         # https://stackoverflow.com/questions/10574969/how-do-i-install-bash-3-2-25-on-mac-os-x-10-5-8
-    echo '/opt/homebrew/bin/bash' | sudo tee -a /etc/shells;
+    grep '/opt/homebrew/bin/bash' /etc/shells ||  echo '/opt/homebrew/bin/bash' | sudo tee -a /etc/shells;
     [[ "$PATH" == *"homebrew"* ]] || echo -e "PATH=/opt/homebrew/bin:$PATH" >> $runpath/.bash_profile_portable
     [[ "$SHELL" == *"bash"* ]] || chsh -s /opt/homebrew/bin/bash
 
-    gumma_install reattach-to-user-namespace
+    command -v reattach-to-user-namespace || gumma_install reattach-to-user-namespace
 
     # iTerm
     command -v wget || gumma_install wget
@@ -267,7 +269,7 @@ if [[ "$OSTYPE" != "cygwin" ]]; then
     command -v git || gumma_install git
     [ `which ctags` == "$CTAGSBIN" ] || gumma_install ctags || gumma_install exuberant-ctags
     [ `which tmux` == "$TMUXBIN" ] || gumma_install tmux
-    gumma_install vim
+    vim --version | grep -qE "\+mouse|\+clipboard" || gumma_install vim
 
     ## Setup SSH
     echo "Plugin: YouCompleteMe needs to be compiled. Go to its website to get instructions"
@@ -293,6 +295,9 @@ fi
 
 ## Git
 git config --global core.editor "vim"
+
+## Tmux
+[[ -d ~/.tmux/plugins/tpm ]] || git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 #exec -l $SHELL not sure what this is for
 echo "Setup finished"
