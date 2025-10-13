@@ -267,7 +267,7 @@ fi
 if [[ "$OSTYPE" != "cygwin" ]]; then
     command -v wget || gumma_install wget
     command -v git || gumma_install git
-    [ `which ctags` == "$CTAGSBIN" ] || gumma_install ctags || gumma_install exuberant-ctags
+    [ `which ctags` == "$CTAGSBIN" ] || gumma_install universal-ctags || gumma_install exuberant-ctags
     [ `which tmux` == "$TMUXBIN" ] || gumma_install tmux
     vim --version | grep -qE "\+mouse|\+clipboard" || gumma_install vim
 
