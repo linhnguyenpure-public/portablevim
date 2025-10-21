@@ -38,8 +38,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     #if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
     #  exec tmux
     #fi
-#Cygwin
-elif [[ "$OSTYPE" == "cygwin" ]]; then
+#Cygwin or WSL
+elif [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "linux-gnu" ]]; then
     if [ -f "${HOME}/.bashrc" ] ; then
         source "${HOME}/.bashrc"
     fi
