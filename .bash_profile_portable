@@ -31,8 +31,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     }
     
     # Add needed paths cleanly
-      add_to_path "/Library/Frameworks/Python.framework/Versions/3.8/bin"
-      add_to_path "/Users/linh_nguyen2/Documents/pubrepos/portablevim"
+      add_to_path "/Library/Frameworks/Python.framework/Versions/3.10/bin"
+      add_to_path "~/repos/portablevim"
+      add_to_path "/opt/homebrew/bin"
     
     #if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
     #  exec tmux
@@ -45,3 +46,19 @@ elif [[ "$OSTYPE" == "cygwin" ]]; then
 fi
 source ~/.proprietary.sh
 stty sane
+
+
+if command -v tmux &> /dev/null &&  # Check if tmux is installed and available
+    [ -n "$PS1" ] &&            # Check if this is an interactive shell
+    [[ ! "$TERM" =~ screen ]] && # Check if not already in a screen session
+    [[ ! "$TERM" =~ tmux ]] &&  # Check if not already in a tmux session
+    [ -z "$TMUX" ]; then       # Check if the TMUX variable is not set (i.e., not inside tmux)
+  tmux
+fi
+
+function fzfgitlog() {
+  git log --graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+  fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+      --preview="grep -oE '[a-f0-9]{7,}' <<< {} | head -1 | xargs -I % sh -c 'git show --color=always % | less -R'" \
+      --header="Press CTRL-S to toggle sort" --preview-window=right:70%
+}

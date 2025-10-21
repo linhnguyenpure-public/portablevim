@@ -65,6 +65,7 @@ echo "~/.tmux.conf"
 echo "~/.tmux"
 echo "~/.vimrc, ~/.vim"
 echo "~/.ctags"
+echo "~/.bash_profile"
 set -x
 read -n 1 -s -r -p "Press c to continue, s to skip..." continue && echo
 if [[ $continue == "c" ]]; then
@@ -75,12 +76,15 @@ if [[ $continue == "c" ]]; then
     rm -rf ~/.tmux
     rm -rf ~/.vimrc ~/.vim
     rm -rf ~/.ctags
+    set +e
+    cp ~/.bash_profile ~/.bash_profile.bk
+    set -e
 
     echo "Create and link above files"
     mkdir $runpath
     cp $cpath/.bash_profile_portable $runpath/.bash_profile_portable
     echo -e "PORTABLEVIM=`pwd`\n" >> $runpath/.bash_profile_portable
-    echo -e "source $runpath/.bash_profile_portable\n" >> $runpath/.bash_profile_portable
+    echo -e "source $runpath/.bash_profile_portable\n" >> $runpath/.bash_profile && ( [ -L ~/.bash_profile ] || ln -s $runpath/.bash_profile ~/.bash_profile )
 
     cp -r $cpath/.custom.sh $runpath/.custom.sh && ( [ -L ~/.custom.sh ] || ln -s $runpath/.custom.sh ~/.custom.sh )
 
@@ -189,19 +193,19 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # Setup PATH for bash
         # https://stackoverflow.com/questions/10574969/how-do-i-install-bash-3-2-25-on-mac-os-x-10-5-8
     grep '/opt/homebrew/bin/bash' /etc/shells ||  echo '/opt/homebrew/bin/bash' | sudo tee -a /etc/shells;
-    [[ "$PATH" == *"homebrew"* ]] || echo -e "PATH=/opt/homebrew/bin:$PATH" >> $runpath/.bash_profile_portable
-    [[ "$SHELL" == *"bash"* ]] || chsh -s /opt/homebrew/bin/bash
+    [[ "$PATH" =~ "homebrew" ]] || export PATH="/opt/homebrew/bin:$PATH"
+    [[ "$SHELL" =~ "bash" ]] || chsh -s /opt/homebrew/bin/bash
 
     command -v reattach-to-user-namespace || gumma_install reattach-to-user-namespace
 
     # iTerm
     command -v wget || gumma_install wget
-    if [ ! -d "/Applications/iTerm.app" ] || [ ! -d "/Volumes/LinhData/iTerm.app"] ; then
-        wget https://iterm2.com/downloads/stable/iTerm2-3_4_16.zip
-        unzip iTerm2-3_4_16.zip
-        mv iTerm.app/ /Applications/
-        rm iTerm2-3_4_16.zip
-    fi
+    [ ! -d "/Applications/iTerm.app" ] || [ ! -d "/Volumes/LinhData/iTerm.app" ] || {
+        wget https://iterm2.com/downloads/stable/iTerm2-3_4_16.zip;
+        unzip iTerm2-3_4_16.zip;
+        mv iTerm.app/ /Applications/;
+        rm iTerm2-3_4_16.zip;
+    }
 fi
 
 ## OS-specific Setup: Apps -- Cygwin 
